@@ -1,6 +1,7 @@
 # //= require_tree ./extensions
 # //= require action_query/class_methods
 # //= require action_query/private_methods
+# //= require action_query/collection
 @ActionQuery ?= {}
 class ActionQuery.$Base extends Module
   @extend(ActionQuery.$ClassMethods)

@@ -18,10 +18,23 @@ class @ActionQuery.$ClassMethods
         path = path.replace /\(.*\)/, (match) ->
           return '' if match.indexOf(':') >= 0
           return match[1..-2]
-        paths.push(weight: route.requirements.length, path: path, verb: route.verb)
+        paths.push(weight: route.requirements.length, path: path, verb: route.verb, method: route.method)
       weight = paths.pluck('weight').max()
       path = (paths.filter (path) -> path.weight == weight).first()
-      @_sendRequest(path,params)
+      if path.method != 'index'
+        @_sendRequest(path,params)
+      else
+        @_fetchCollection(path,params)
+
+  _fetchCollection: (details,params) ->
+    data = {}
+    data[@name.underscore()] = params
+    promise = $.ajax(
+      url: details.path
+      method: details.verb
+      data: data
+    )
+    return new ActionQuery.$Collection(@,promise)
 
   _sendRequest: (details,params) ->
     data = {}
