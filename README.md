@@ -18,6 +18,12 @@ Or install it yourself as:
 
     $ gem install action_query
 
+Install the action_query config if you have non standard custom routes
+
+    $ rails g action_query:install
+
+And then edit the file config/initializers/action_query.rb to declare which routes return array's vs members
+
 ## Usage
 
 Javascript classes with the ActionQuery name space will be created.  These classes will coincide with models that have routes in the routes.rb.

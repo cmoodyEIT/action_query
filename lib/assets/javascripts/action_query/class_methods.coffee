@@ -18,16 +18,13 @@ class @ActionQuery.$ClassMethods
         path = path.replace /\(.*\)/, (match) ->
           return '' if match.indexOf(':') >= 0
           return match[1..-2]
-        paths.push(weight: route.requirements.length, path: path, verb: route.verb, method: route.method)
+        paths.push(weight: route.requirements.length, path: path, verb: route.verb, method: route.method, array: route.array)
       weight = paths.pluck('weight').max()
       path = (paths.filter (path) -> path.weight == weight).first()
-      if @_isCollection(path,params)
+      if path.array
         @_fetchCollection(path,params)
       else
         @_sendRequest(path,params)
-
-  _isCollection: (route,params) ->
-    !params.id && route.verb.toUpperCase() != 'POST'
 
   _fetchCollection: (details,params) ->
     data = {}

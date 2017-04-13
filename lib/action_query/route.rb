@@ -1,6 +1,7 @@
 module ActionQuery
   module Route
     def self.result
+      variances = HashWithIndifferentAccess.new(::Rails.application.config.action_query) rescue {}
       controllers = HashWithIndifferentAccess.new
       ::Rails.application.routes.routes.each do |route|
         next unless route.defaults[:controller]
@@ -11,12 +12,17 @@ module ActionQuery
           obj = obj[name.classify()]
         end
         obj[route.defaults[:action]] ||= []
+        notArray = !!route.path.spec.to_s.match(/\:id/) || ['CREATE','NEW'].include?(route.defaults[:action].upcase)
+        if (variance = HashWithIndifferentAccess.new(variances[route.defaults[:controller]])).present?
+          notArray = !variance[route.defaults[:action]][:array] unless variance[route.defaults[:action]].nil?
+        end
         path = {
-          parts: route.parts.map(&:to_s),
-          path: route.path.spec.to_s,
-          verb: route.verb,
+          parts:        route.parts.map(&:to_s),
+          path:         route.path.spec.to_s,
+          verb:         route.verb,
           requirements: route.required_parts.map(&:to_s),
-          method: route.defaults[:action]
+          method:       route.defaults[:action],
+          array:        !notArray
         }
         obj[route.defaults[:action]] << path
       end
