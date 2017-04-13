@@ -21,10 +21,13 @@ class @ActionQuery.$ClassMethods
         paths.push(weight: route.requirements.length, path: path, verb: route.verb, method: route.method)
       weight = paths.pluck('weight').max()
       path = (paths.filter (path) -> path.weight == weight).first()
-      if path.method != 'index'
-        @_sendRequest(path,params)
-      else
+      if @_isCollection(path,params)
         @_fetchCollection(path,params)
+      else
+        @_sendRequest(path,params)
+
+  _isCollection: (route,params) ->
+    !params.id && route.verb.toUpperCase() != 'POST'
 
   _fetchCollection: (details,params) ->
     data = {}
